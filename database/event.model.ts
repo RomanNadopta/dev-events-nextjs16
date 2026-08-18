@@ -18,6 +18,7 @@ export interface IEvent extends Document {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
+  id: string;
 }
 
 const EventSchema = new Schema<IEvent>(
@@ -103,6 +104,10 @@ const EventSchema = new Schema<IEvent>(
         message: 'At least one tag is required',
       },
     },
+    id: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, // Auto-generate createdAt and updatedAt
@@ -110,7 +115,7 @@ const EventSchema = new Schema<IEvent>(
 );
 
 // Pre-save hook for slug generation and data normalization
-EventSchema.pre('save', function (next) {
+EventSchema.pre('save', function () {
   const event = this as IEvent;
 
   // Generate slug only if title changed or document is new
@@ -127,8 +132,6 @@ EventSchema.pre('save', function (next) {
   if (event.isModified('time')) {
     event.time = normalizeTime(event.time);
   }
-
-  next();
 });
 
 // Helper function to generate URL-friendly slug
